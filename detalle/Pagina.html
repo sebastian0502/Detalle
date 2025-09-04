@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Para mi amor</title>
+
+<!-- Fuentes románticas -->
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+  body{
+    margin:0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(180deg, #ffe0ec 0%, #ffd6eb 50%, #ffeaf6 100%);
+    color:#5a2a2a;
+    text-align:center;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding:20px;
+  }
+
+  h1{
+    font-family: 'Dancing Script', cursive;
+    font-size:2rem;
+    max-width: 40ch;
+    margin:30px auto 10px;
+    line-height:1.5;
+  }
+  .cursor::after{
+    content:"|";
+    animation: blink 1s infinite steps(1);
+  }
+  @keyframes blink{50%{opacity:0}}
+
+  /* Árbol */
+  .tree{
+    position:relative;
+    margin:0 auto;
+    width:500px; height:600px; /* árbol más grande */
+  }
+  .trunk{
+    position:absolute;
+    bottom:0; left:50%;
+    width:110px; height:280px; /* tronco más grande */
+    background: linear-gradient(to top, #6e3d2e, #8b5a2b);
+    transform:translateX(-50%);
+    clip-path: polygon(45% 0%, 55% 0%, 80% 100%, 20% 100%);
+  }
+  .canopy{
+    position:absolute;
+    bottom:250px; left:50%;
+    width:500px; height:380px; /* copa más grande */
+    transform:translateX(-50%);
+    border-radius:50%;
+  }
+  .heart{
+    position:absolute;
+    font-size:28px; /* corazones más grandes */
+    opacity:0.9;
+  }
+
+  /* Corazones cayendo */
+  .falling{
+    position:absolute;
+    bottom:250px; left:50%;
+    width:500px; height:380px;
+    transform:translateX(-50%);
+    pointer-events:none;
+  }
+  .falling .flake{
+    position:absolute;
+    animation: fall linear forwards;
+  }
+  @keyframes fall{
+    to{ 
+      transform: translateY(380px) translateX(80px) rotate(360deg); 
+      opacity:0; 
+    }
+  }
+
+  /* Footer */
+  .footer{
+    margin-top:50px;
+    font-size:1.6rem;
+    font-family: 'Dancing Script', cursive;
+  }
+  .since{opacity:.9; margin-bottom:12px;}
+  .count{font-weight:600; font-size:1.8rem;}
+
+  /* Ositos bajo el árbol, a la derecha */
+  .bears{
+    position:absolute;
+    bottom:-10px;
+    right:40px;
+  }
+  .bears img{
+    max-width:180px;
+  }
+</style>
+</head>
+<body>
+  <h1 id="typeTarget" class="cursor"
+      data-text="Para la persona que más amo: eres mi persona especial, mi lugar seguro. Perdóname por los malos momentos. Gracias por regalarme tantos buenos, porque cuanto más tiempo estoy contigo, más te amo.">
+  </h1>
+
+  <div class="tree">
+    <div class="canopy" id="canopy"></div>
+    <div class="trunk"></div>
+    <div class="falling" id="falling"></div>
+    <div class="bears">
+      <!-- Tu gif transparente -->
+      <img src="casal-dudu.gif" alt="Ositos abrazados debajo del árbol">
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="since">Nuestros caminos se cruzaron hace…</div>
+    <div class="count" id="counter">—</div>
+  </div>
+
+<script>
+(() => {
+  const START_DATE = new Date('2022-04-21T00:00:00'); 
+  const canopy = document.getElementById("canopy");
+  const falling = document.getElementById("falling");
+
+  // Colores y copa redondeada (árbol frondoso)
+  const colors = ["#ff4d6d","#ff6b9d","#ff85a1","#ff9fb6","#ffb3c6"];
+  for(let i=0;i<400;i++){ // más corazones por frondosidad
+    const h=document.createElement("div");
+    h.className="heart";
+    h.textContent="❤";
+    // Distribuir en una elipse
+    let angle = Math.random() * 2 * Math.PI;
+    let rx = 220, ry = 160; 
+    let x = Math.cos(angle) * rx * Math.random();
+    let y = Math.sin(angle) * ry * Math.random();
+    h.style.left = (250 + x) + "px";
+    h.style.top = (180 + y) + "px";
+    h.style.color = colors[Math.floor(Math.random()*colors.length)];
+    canopy.appendChild(h);
+  }
+
+  // Corazones cayendo con movimiento horizontal
+  function spawnHeart(){
+    const f=document.createElement("div");
+    f.className="flake";
+    f.textContent="❤";
+    f.style.left=(Math.random()*460)+"px";
+    f.style.top=(Math.random()*140)+"px";
+    f.style.color=colors[Math.floor(Math.random()*colors.length)];
+    const dur=6+Math.random()*4;
+    f.style.fontSize=(18+Math.random()*16)+"px";
+    f.style.animationDuration=dur+"s";
+    falling.appendChild(f);
+    setTimeout(()=>f.remove(), dur*1000);
+  }
+  setInterval(spawnHeart, 280);
+
+  // Contador
+  const counter=document.getElementById("counter");
+  function updateCounter(){
+    const now=new Date();
+    let diff=now-START_DATE;
+    const sec=Math.floor(diff/1000)%60;
+    const min=Math.floor(diff/60000)%60;
+    const hr=Math.floor(diff/3600000)%24;
+    const days=Math.floor(diff/86400000);
+    counter.textContent=`${days} días, ${hr} horas, ${min} minutos y ${sec} segundos`;
+  }
+  setInterval(updateCounter,1000);
+  updateCounter();
+
+  // Texto máquina de escribir
+  const typeEl=document.getElementById("typeTarget");
+  const fullText=typeEl.dataset.text;
+  let i=0;
+  const speed=100; 
+  function typeStep(){
+    if(i<=fullText.length){
+      typeEl.textContent=fullText.slice(0,i);
+      i++;
+      setTimeout(typeStep,speed);
+    }else{
+      typeEl.classList.remove("cursor");
+    }
+  }
+  typeStep();
+})();
+</script>
+</body>
+</html>
